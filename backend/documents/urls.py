@@ -1,12 +1,17 @@
 from django.urls import path
 
-from .views import DocumentUploadView
+from .views import DocumentUploadView, AskQuestionView
 
 
 urlpatterns = [
     path(
-        'upload/',
+        "upload/",
         DocumentUploadView.as_view(),
-        name='document-upload'
+        name="document-upload",
+    ),
+    path(
+        "ask/",
+        AskQuestionView.as_view(),
+        name="ask-question",
     ),
 ]

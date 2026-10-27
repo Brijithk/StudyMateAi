@@ -20,3 +20,10 @@ class DocumentSerializer(serializers.ModelSerializer):
             'status',
             'uploaded_at',
         ]
+
+class AskQuestionSerializer(serializers.Serializer):
+    document_id = serializers.IntegerField(min_value=1)
+    question = serializers.CharField(
+        max_length=2000,
+        trim_whitespace=True
+    )

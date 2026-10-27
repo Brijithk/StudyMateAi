@@ -1,0 +1,48 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django generated files
+*.log
+local_settings.py
+
+# Local databases
+db.sqlite3
+db.sqlite3-journal
+
+# Uploaded files (may contain private study materials)
+backend/media/
+media/
+
+# ChromaDB vector database
+chroma_db/
+
+# Machine learning model/cache files
+.cache/
+.cache_huggingface/
+huggingface_cache/
+
+# Environment and testing files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
