@@ -5,8 +5,11 @@ from rest_framework.views import APIView
 
 from .models import Document
 from .serializers import DocumentSerializer, AskQuestionSerializer
+from .services.document_processor import process_document
 from .services.rag_service import answer_question
+import logging
 
+logger = logging.getLogger(__name__)
 
 class DocumentUploadView(generics.CreateAPIView):
     serializer_class = DocumentSerializer
@@ -16,9 +19,19 @@ class DocumentUploadView(generics.CreateAPIView):
     def get_queryset(self):
         return Document.objects.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+def perform_create(self, serializer):
+    document = serializer.save(user=self.request.user)
 
+    try:
+        process_document(document.id)
+    except Exception:
+        logger.exception(
+            "Failed to process uploaded document %s",
+            document.id,
+        )
+
+    document.refresh_from_db()
+    document.refresh_from_db()
 
 class AskQuestionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -30,7 +43,6 @@ class AskQuestionView(APIView):
         document_id = serializer.validated_data["document_id"]
         question = serializer.validated_data["question"]
 
-        # Only allow access to documents owned by this user.
         document = Document.objects.filter(
             id=document_id,
             user=request.user,
@@ -42,7 +54,6 @@ class AskQuestionView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        # The document must have been processed and indexed.
         if document.status != "completed":
             return Response(
                 {
@@ -77,7 +88,6 @@ class AskQuestionView(APIView):
             )
 
         except Exception:
-            # Log the exception on the server before investigating it.
             return Response(
                 {
                     "error": (
@@ -87,3 +97,12 @@ class AskQuestionView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+class DocumentListView(generics.ListAPIView):
+    serializer_class = DocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Document.objects.filter(
+            user=self.request.user
+        ).order_by("-uploaded_at")
