@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from .views import RegisterView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -10,7 +11,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path(
+    'api/auth/register/',
+    RegisterView.as_view(),
+    name='register'
+    ),
     path(
         'api/documents/',
         include('documents.urls')
